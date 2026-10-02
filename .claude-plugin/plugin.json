@@ -1,0 +1,46 @@
+{
+  "name": "pomodoro",
+  "version": "0.4.0",
+  "description": "Button-first Pomodoro timer above the Claude Code prompt: one-click focus blocks, a live countdown band, break reminders and a config pane.",
+  "author": {
+    "name": "Silvio Ney",
+    "url": "https://github.com/sneycampos"
+  },
+  "homepage": "https://github.com/sneycampos/claude-pomodoro",
+  "repository": "https://github.com/sneycampos/claude-pomodoro",
+  "license": "MIT",
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "focus",
+    "productivity",
+    "breaks"
+  ],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "focusMinutes": {
+      "type": "number",
+      "title": "Focus minutes",
+      "description": "Default length of a focus block.",
+      "default": 25
+    },
+    "breakMinutes": {
+      "type": "number",
+      "title": "Break minutes",
+      "description": "Default length of a short break.",
+      "default": 5
+    },
+    "longBreakMinutes": {
+      "type": "number",
+      "title": "Long break minutes",
+      "description": "Default length of a long break.",
+      "default": 15
+    },
+    "longAfter": {
+      "type": "number",
+      "title": "Focuses before long break",
+      "description": "How many focus blocks come before a long break (1 to 12).",
+      "default": 4
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "claude-pomodoro",
+  "owner": {
+    "name": "Silvio Ney",
+    "url": "https://github.com/sneycampos"
+  },
+  "metadata": {
+    "description": "Pomodoro timer plugin for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "pomodoro",
+      "source": "./",
+      "description": "Button-first Pomodoro timer above the Claude Code prompt: one-click focus blocks, a live countdown band, break reminders and a config pane.",
+      "version": "0.4.0",
+      "license": "MIT",
+      "keywords": [
+        "pomodoro",
+        "timer",
+        "focus",
+        "productivity",
+        "breaks"
+      ]
+    }
+  ]
+}
