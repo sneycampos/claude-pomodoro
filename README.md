@@ -63,14 +63,16 @@ aside.
 
 When a focus block ends:
 
-1. A toast says `Pomodoro break — step away from the keyboard`.
+1. A chime plays and a toast says `Pomodoro break — step away from the
+   keyboard`.
 2. A break Pane opens with the countdown and controls. `Esc` or **dismiss**
    (`d`) closes the Pane only; the break keeps running.
 3. The band and the status line switch to the break colors.
 
 After `longAfter` focus blocks (4 by default) the break is a long break. When
-a break ends, the Pane closes, a toast says `Back to focus`, and the next focus
-block starts on its own. Skipping a focus block counts toward the long break,
+a break ends, a rising chime plays, the Pane closes, a toast says
+`Back to focus`, and the next focus block starts on its own. Chimes play only
+when a block runs out, not when you skip or stop it. Skipping a focus block counts toward the long break,
 the same as finishing it.
 
 ### Config Pane
@@ -114,6 +116,7 @@ plugin's settings screen:
 | Break minutes             | 5       |
 | Long break minutes        | 15      |
 | Focuses before long break | 4       |
+| Play a sound              | on      |
 
 A change made in the config Pane or with `/pomodoro config` is saved and wins
 over these settings until you change the settings themselves or run
@@ -126,6 +129,8 @@ over these settings until you change the settings themselves or run
   tick or a sleeping laptop does not make it drift.
 - Every change to the timer goes through one conflict-checked update, so a
   button press and a clock tick at the same moment cannot undo each other.
+- Chimes play through the platform's audio player (`afplay` on macOS); where
+  there is none, the timer works silently.
 - Saved config lives in the plugin's own store under your Claude Code
   configuration directory.
 
@@ -151,6 +156,7 @@ Layout:
 hooks/hooks.json                  points at the hooks module
 hooks/pomodoro.ts                 the plugin
 types/index.d.ts                  the plugin's state contract
+sounds/                           the break and focus chimes
 tests/pomodoro.test.ts            tests run by `claude plugin test`
 ```
 

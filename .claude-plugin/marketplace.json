@@ -12,7 +12,7 @@
       "name": "pomodoro",
       "source": "./",
       "description": "Button-first Pomodoro timer above the Claude Code prompt: one-click focus blocks, a live countdown band, break reminders and a config pane.",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "license": "MIT",
       "keywords": [
         "pomodoro",

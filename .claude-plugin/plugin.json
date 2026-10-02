@@ -1,6 +1,6 @@
 {
   "name": "pomodoro",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Button-first Pomodoro timer above the Claude Code prompt: one-click focus blocks, a live countdown band, break reminders and a config pane.",
   "author": {
     "name": "Silvio Ney",
@@ -41,6 +41,12 @@
       "title": "Focuses before long break",
       "description": "How many focus blocks come before a long break (1 to 12).",
       "default": 4
+    },
+    "sound": {
+      "type": "boolean",
+      "title": "Play a sound",
+      "description": "Chime when a focus block or a break runs out.",
+      "default": true
     }
   }
 }

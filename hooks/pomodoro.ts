@@ -94,6 +94,19 @@ let tick: Timer | undefined
 /** Defaults from plugin userConfig, merged at register(). */
 let baseConfig: TimerConfig = { ...DEFAULTS }
 
+/** Whether a chime plays when a block runs out (plugin setting `sound`). */
+let soundOn = true
+
+const SOUNDS = { break: 'sounds/break.wav', focus: 'sounds/focus.wav' } as const
+
+/** Plays a chime without waiting for it; a missing player is not an error. */
+function chime($: Engine, kind: keyof typeof SOUNDS): void {
+  if (!soundOn) return
+  $.audio.play({ asset: SOUNDS[kind] }).catch(() => {
+    // No audio player on this platform, or playback refused.
+  })
+}
+
 /** One second up to MAX_MINUTES; fractions of a minute are allowed. */
 function isValidMinutes(n: number): boolean {
   return Number.isFinite(n) && n >= 1 / 60 && n <= MAX_MINUTES
@@ -390,6 +403,7 @@ async function afterTransition(
   $: Engine,
   before: TimerState,
   after: TimerState,
+  fromClock: boolean,
 ): Promise<void> {
   syncStatus($, after)
   if (after.phase === 'idle') {
@@ -403,6 +417,7 @@ async function afterTransition(
   const to = activePhase(after)
   if (from === 'focus' && isBreakPhase(to) && after.phase !== 'paused') {
     const long = to === 'long'
+    if (fromClock) chime($, 'break')
     $.ui.toast(
       long
         ? 'Pomodoro long break — step away from the keyboard'
@@ -411,6 +426,7 @@ async function afterTransition(
     )
     await openBreakPane($, long ? 'long' : 'break')
   } else if (isBreakPhase(from) && to === 'focus') {
+    if (fromClock) chime($, 'focus')
     await closeBreakPane($)
     $.ui.toast('Back to focus', { timeoutMs: BREAK_TOAST_MS })
   }
@@ -420,13 +436,14 @@ async function afterTransition(
 async function transition(
   $: Engine,
   fn: (t: TimerState) => TimerState,
+  fromClock = false,
 ): Promise<{ before: TimerState; after: TimerState }> {
   let before = idleState()
   const after = await mutate($, (t) => {
     before = t
     return fn(t)
   })
-  await afterTransition($, before, after)
+  await afterTransition($, before, after, fromClock)
   return { before, after }
 }
 
@@ -436,7 +453,7 @@ async function onTick($: Engine): Promise<void> {
     if (!isRunning(t) || t.endsAt === null) return t
     const remainingMs = Math.max(0, t.endsAt - now)
     return remainingMs > 0 ? { ...t, remainingMs } : advance(t, now)
-  })
+  }, true)
 }
 
 async function startFocus($: Engine, minutes?: number): Promise<string> {
@@ -897,6 +914,7 @@ async function handleCommand($: Engine, rawIn: string): Promise<{ text: string }
 
 export function register(on: On, options: PluginOptions = {}): void {
   baseConfig = configFromOptions(options)
+  soundOn = options.sound !== false
 
   on('session.start', async ($, e, next) => {
     stopTick()

@@ -22,6 +22,7 @@ type World = {
   closed: () => string[]
   registered: () => string[]
   invalidations: () => string[]
+  sounds: () => string[]
 }
 
 function world(
@@ -38,6 +39,7 @@ function world(
   const closed: string[] = []
   const registered: string[] = []
   const invalidations: string[] = []
+  const sounds: string[] = []
   const openIds = new Set<string>()
 
   on('state.get', () => ({ value: { value: state, version } }))
@@ -88,6 +90,10 @@ function world(
       isPlaced: true,
     })),
   }))
+  on('audio.play', (_$, e) => {
+    sounds.push(e.clip.asset ?? '')
+    return { value: undefined }
+  })
   on('ui.invalidate', (_$, e) => {
     invalidations.push(e.event)
     return { value: undefined }
@@ -105,6 +111,7 @@ function world(
     closed: () => closed,
     registered: () => registered,
     invalidations: () => invalidations,
+    sounds: () => sounds,
   }
 }
 
@@ -665,5 +672,34 @@ describe('pomodoro', () => {
     expect(w.state().config.focusMs).toBe(25 * 60_000)
     await startSession($)
     expect(w.state().config.focusMs).toBe(25 * 60_000)
+  })
+
+  test('a block running out plays its chime', async ($, on) => {
+    const w = world(on)
+    await startSession($)
+    await runPomodoro($, 'start 1')
+    await w.clock.advance(60_000)
+    expect(w.sounds()).toEqual(['sounds/break.wav'])
+    await w.clock.advance(5 * 60_000)
+    expect(w.sounds()).toEqual(['sounds/break.wav', 'sounds/focus.wav'])
+  })
+
+  test('skip and stop play no chime', async ($, on) => {
+    const w = world(on)
+    await startSession($)
+    await runPomodoro($, 'start 1')
+    await runPomodoro($, 'skip')
+    await runPomodoro($, 'skip')
+    await runPomodoro($, 'stop')
+    expect(w.sounds()).toEqual([])
+  })
+
+  test('the sound setting turns chimes off', { options: { sound: false } }, async ($, on) => {
+    const w = world(on)
+    await startSession($)
+    await runPomodoro($, 'start 1')
+    await w.clock.advance(60_000)
+    expect(w.state().phase).toBe('break')
+    expect(w.sounds()).toEqual([])
   })
 })
